@@ -59,6 +59,42 @@ const TAALS = {
         symbols: ["X", "", "", "0", "", ""],
         bols: ["Dha", "Ge", "Na", "Dha", "Tin", "Na"],
         description: "6 beats cycle divided as 3+3. A lively, bouncing light classical rhythm."
+    },
+    deepchandi: {
+        id: "deepchandi",
+        name: "Deepchandi",
+        beats: 14,
+        vibhags: [3, 4, 3, 4],
+        symbols: ["X", "", "", "2", "", "", "", "0", "", "", "3", "", "", ""],
+        bols: ["Dha", "Dhin", "•", "Dhin", "Dha", "Dha", "•", "Tin", "Tin", "•", "Ta", "Dhin", "Dhin", "Dha"],
+        description: "14 beats cycle divided as 3+4+3+4. Highly popular in semi-classical music (Thumri, Ghazal) with a bouncing, graceful flow."
+    },
+    dhamar: {
+        id: "dhamar",
+        name: "Dhamar",
+        beats: 14,
+        vibhags: [5, 2, 3, 4],
+        symbols: ["X", "", "", "", "", "2", "", "0", "", "", "3", "", "", ""],
+        bols: ["Kha", "Dhi", "Ta", "Dhi", "Ta", "Dha", "•", "Ga", "Ti", "Ta", "Ta", "Re", "Ke", "Te"],
+        description: "14 beats cycle divided as 5+2+3+4. Heavy, syncopated time cycle traditional to Dhrupad Dhamar singing."
+    },
+    chautal: {
+        id: "chautal",
+        name: "Chautal",
+        beats: 12,
+        vibhags: [2, 2, 2, 2, 2, 2],
+        symbols: ["X", "", "0", "", "2", "", "0", "", "3", "", "4", ""],
+        bols: ["Dha", "Dha", "Din", "Ta", "Kite", "Dha", "Din", "Ta", "Tete", "Kata", "Gadi", "Gana"],
+        description: "12 beats cycle divided as 2+2+2+2+2+2. A powerful, open-sounding time cycle played on the Pakhawaj in Dhrupad music."
+    },
+    sawari: {
+        id: "sawari",
+        name: "Pancham Sawari",
+        beats: 15,
+        vibhags: [3, 4, 4, 4],
+        symbols: ["X", "", "", "2", "", "", "", "0", "", "", "", "3", "", "", ""],
+        bols: ["Dhi", "Na", "Dhi", "Na", "Dhe", "Dhin", "Na", "Ti", "Tira", "Kite", "Tira", "Ke", "Ta", "Dhin", "Na"],
+        description: "15 beats cycle divided as 3+4+4+4. A complex and respected odd-time cycle widely practiced by advanced soloists."
     }
 };
 
@@ -112,6 +148,38 @@ const MELODIES = {
         bhupali: [0, 4, 7, 9, null, 7],
         kafi: [0, 3, 7, 9, null, 10],
         bilawal: [0, 4, 7, 9, null, 11]
+    },
+    // Deepchandi (14 Beats)
+    deepchandi: {
+        yaman: [4, null, 2, 0, -1, null, 2, null, 4, null, 6, null, 7, 11],
+        bhairavi: [3, null, 1, 0, -2, null, 1, null, 3, null, 5, null, 7, 10],
+        bhupali: [4, null, 2, 0, -3, null, 2, null, 4, null, 7, null, 9, 12],
+        kafi: [3, null, 2, 0, -2, null, 2, null, 3, null, 5, null, 7, 10],
+        bilawal: [4, null, 2, 0, -1, null, 2, null, 4, null, 5, null, 7, 11]
+    },
+    // Dhamar (14 Beats)
+    dhamar: {
+        yaman: [0, 2, 4, 6, 7, 7, null, 9, 11, 12, 11, 9, 7, 4],
+        bhairavi: [0, 1, 3, 5, 7, 7, null, 8, 10, 12, 10, 8, 7, 3],
+        bhupali: [0, 2, 4, 7, 9, 9, null, 12, 14, 12, 9, 7, 4, 0],
+        kafi: [0, 2, 3, 5, 7, 7, null, 9, 10, 12, 10, 9, 7, 3],
+        bilawal: [0, 2, 4, 5, 7, 7, null, 9, 11, 12, 11, 9, 7, 4]
+    },
+    // Chautal (12 Beats)
+    chautal: {
+        yaman: [0, null, 4, null, 6, 7, 9, 11, 12, null, 7, 4],
+        bhairavi: [0, null, 3, null, 5, 7, 8, 10, 12, null, 7, 3],
+        bhupali: [0, null, 4, null, 7, 7, 9, 12, 14, null, 9, 4],
+        kafi: [0, null, 3, null, 5, 7, 9, 10, 12, null, 7, 3],
+        bilawal: [0, null, 4, null, 5, 7, 9, 11, 12, null, 7, 4]
+    },
+    // Pancham Sawari (15 Beats)
+    sawari: {
+        yaman: [0, null, 2, 4, null, 6, 7, 9, null, 11, 12, 11, null, 7, 4],
+        bhairavi: [0, null, 1, 3, null, 5, 7, 8, null, 10, 12, 10, null, 7, 3],
+        bhupali: [0, null, 2, 4, null, 7, 9, 9, null, 12, 14, 12, null, 9, 4],
+        kafi: [0, null, 2, 3, null, 5, 7, 9, null, 10, 12, 10, null, 7, 3],
+        bilawal: [0, null, 2, 4, null, 5, 7, 9, null, 11, 12, 11, null, 7, 4]
     }
 };
 
