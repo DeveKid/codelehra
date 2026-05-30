@@ -1,0 +1,14 @@
+# Ignore the large reference audio recording (51MB)
+*.mp3
+*.wav
+
+# Ignore Python caches and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+ENV/

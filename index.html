@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeLehra - Minimal Tabla Practice Companion</title>
+    <meta name="description" content="A minimalist, high-end Lehra and Tanpura accompaniment app for Tabla practice. Fully responsive, lag-free legatos, and no-scroll UI.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- TOP MINIMAL HEADER -->
+        <header class="minimal-header">
+            <div class="brand">
+                <i class="fa-solid fa-keyboard brand-icon"></i>
+                <span class="brand-title">CodeLehra</span>
+            </div>
+            
+            <!-- HEADER RIGHT: GEMINI SIGNATURE & MINIMAL STATUS DOT -->
+            <div class="header-right">
+                <span class="gemini-signature">Made with <i class="fa-solid fa-heart beating-heart"></i> by Gemini</span>
+                <div class="status-indicator" id="statusBadge" aria-label="Audio Status">
+                    <span class="status-dot"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN VIEWPORT GRID -->
+        <main class="main-content">
+            <!-- LEFT COLUMN: THE BEAT CHAKRA & PLAY BUTTON -->
+            <section class="visualizer-section" aria-label="Visual Beat Cycle">
+                <div class="visualizer-container">
+                    <div class="chakra-wrapper">
+                        <!-- Audio Context Init Overlay -->
+                        <div class="audio-init-overlay" id="audioInitOverlay">
+                            <div class="init-content">
+                                <i class="fa-solid fa-wand-magic-sparkles start-icon pulse"></i>
+                                <h3>Start Riyaz</h3>
+                                <p>Click below to initialize the high-performance Web Audio engine.</p>
+                                <button class="btn btn-primary" id="initAudioBtn">
+                                    Enable Audio
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Beat Chakra SVG -->
+                        <div class="chakra-svg-container">
+                            <svg id="beatChakra" viewBox="0 0 400 400" width="100%" height="100%">
+                                <circle cx="200" cy="200" r="165" class="chakra-ring-bg" />
+                                <circle cx="200" cy="200" r="165" class="chakra-ring-progress" id="ringProgress" />
+                                <line x1="200" y1="35" x2="200" y2="200" class="chakra-needle" id="chakraNeedle" />
+                            </svg>
+                            
+                            <!-- Center HUD (Static, Absolute Spatial Locks to prevent shifting) -->
+                            <div class="center-hud">
+                                <div class="hud-top">MATRA</div>
+                                <div class="hud-beat-num" id="hudBeatNum">--</div>
+                                <div class="hud-info">
+                                    <span class="hud-symbol" id="hudSymbol">-</span>
+                                    <span class="hud-divider">|</span>
+                                    <span class="hud-swar" id="hudSwar">-</span>
+                                </div>
+                                <div class="hud-bol-label" id="hudBolLabel">Ready</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DEDICATED PLAY BUTTON BELOW THE CIRCLE -->
+                    <div class="play-action-wrapper">
+                        <button class="btn-main-play paused" id="playPauseBtn" disabled aria-label="Toggle Playback">
+                            <i class="fa-solid fa-play"></i> <span id="playBtnText">PLAY</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: MINIMALIST CONTROLS -->
+            <section class="controls-section" aria-label="Playback Settings">
+                <div class="controls-grid">
+                    
+                    <!-- GROUP 1: MUSIC SETTINGS -->
+                    <div class="control-card">
+                        <h3><i class="fa-solid fa-music"></i> Melody & Scale</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="taalSelect">Taal</label>
+                                <div class="select-wrapper">
+                                    <select id="taalSelect">
+                                        <option value="teental" selected>Teental (16)</option>
+                                        <option value="ektaal">Ektaal (12)</option>
+                                        <option value="jhaptal">Jhaptal (10)</option>
+                                        <option value="keharwa">Keharwa (8)</option>
+                                        <option value="rupak">Rupak (7)</option>
+                                        <option value="dadra">Dadra (6)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <label for="ragaSelect">Raga</label>
+                                <div class="select-wrapper">
+                                    <select id="ragaSelect">
+                                        <option value="yaman" selected>Yaman</option>
+                                        <option value="bhairavi">Bhairavi</option>
+                                        <option value="bhupali">Bhupali</option>
+                                        <option value="kafi">Kafi</option>
+                                        <option value="bilawal">Bilawal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="keySelect">Key (Sa)</label>
+                                <div class="select-wrapper">
+                                    <select id="keySelect">
+                                        <option value="C4">C4 (Safed 1)</option>
+                                        <option value="C#4" selected>C#4 (Kali 1)</option>
+                                        <option value="D4">D4 (Safed 2)</option>
+                                        <option value="D#4">D#4 (Kali 2)</option>
+                                        <option value="E4">E4 (Safed 3)</option>
+                                        <option value="F4">F4 (Safed 4)</option>
+                                        <option value="F#4">F#4 (Kali 3)</option>
+                                        <option value="G4">G4 (Safed 5)</option>
+                                        <option value="G#4">G#4 (Kali 4)</option>
+                                        <option value="A4">A4 (Safed 6)</option>
+                                        <option value="A#4">A#4 (Kali 5)</option>
+                                        <option value="B4">B4 (Safed 7)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <label for="instrumentSelect">Tone</label>
+                                <div class="select-wrapper">
+                                    <select id="instrumentSelect">
+                                        <option value="harmonium" selected>Harmonium</option>
+                                        <option value="flute">Bansuri Flute</option>
+                                        <option value="sine">Soft Sine</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GROUP 2: SPEED (LAYA) -->
+                    <div class="control-card">
+                        <div class="card-header-row">
+                            <h3><i class="fa-solid fa-gauge-high"></i> Tempo</h3>
+                            <span class="tempo-display"><span id="bpmValue">120</span> <small>BPM</small></span>
+                        </div>
+                        
+                        <div class="tempo-slider-wrapper">
+                            <button class="tempo-btn" id="tempoMinus" aria-label="Decrease BPM"><i class="fa-solid fa-minus"></i></button>
+                            <input type="range" id="bpmSlider" min="40" max="300" value="120" class="minimal-slider">
+                            <button class="tempo-btn" id="tempoPlus" aria-label="Increase BPM"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        
+                        <div class="tempo-footer">
+                            <span class="laya-tag" id="layaLabel">Madhya Laya</span>
+                            <button class="btn btn-tap" id="tapTempoBtn"><i class="fa-solid fa-fingerprint"></i> Tap Tempo</button>
+                        </div>
+                    </div>
+
+                    <!-- GROUP 3: MIXER -->
+                    <div class="control-card">
+                        <h3><i class="fa-solid fa-sliders"></i> Mixer</h3>
+                        
+                        <div class="mixer-row">
+                            <span class="mixer-label"><i class="fa-solid fa-music"></i> Lehra</span>
+                            <input type="range" id="harmoniumVolume" min="0" max="100" value="70" class="minimal-slider">
+                            <span class="mixer-val" id="harmoniumVolVal">70%</span>
+                        </div>
+
+                        <div class="tanpura-compact-card">
+                            <div class="tanpura-compact-header">
+                                <span class="mixer-label"><i class="fa-solid fa-guitar"></i> Tanpura</span>
+                                <div class="tanpura-actions">
+                                    <div class="tuning-selector">
+                                        <button class="tune-btn active" data-tune="Pa">Pa</button>
+                                        <button class="tune-btn" data-tune="Ma">Ma</button>
+                                        <button class="tune-btn" data-tune="Ni">Ni</button>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="tanpuraToggle" checked>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mixer-row tanpura-vol-row" id="tanpuraControlsSection">
+                                <span class="mixer-label sub-vol">Volume</span>
+                                <input type="range" id="tanpuraVolume" min="0" max="100" value="60" class="minimal-slider">
+                                <span class="mixer-val" id="tanpuraVolVal">60%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- BOTTOM BEADS BAR (LEGEND ROW) -->
+        <footer class="theka-bar">
+            <div class="taal-meta">
+                <span class="taal-badge" id="taalBadgeName">Teental</span>
+                <span class="taal-info-text" id="taalDescription">16 beats cycle divided as 4+4+4+4.</span>
+            </div>
+            <div class="theka-ribbon" id="thekaBeadsContainer">
+                <!-- Dynamically generated flat ribbons -->
+            </div>
+        </footer>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
