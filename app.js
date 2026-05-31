@@ -206,7 +206,7 @@ let bpm = 120;
 let selectedTaal = "teental";
 let selectedRaga = "yaman";
 let selectedSa = "C#4";
-let instrumentTone = "harmonium";
+let instrumentTone = "radel";
 
 let harmoniumVolume = 0.7;
 let tanpuraEnabled = true;
@@ -574,6 +574,56 @@ function startLehraVoice(time) {
             breathGain: breathGain
         };
         
+    } else if (instrumentTone === "radel") {
+        // --- RADEL-STYLE LO-FI ELECTRONIC LEHRA MACHINE ---
+        // Blends square wave (75% for nasal digital buzz) + triangle wave (25% for fundamental warmth)
+        const oscSquare = audioContext.createOscillator();
+        const oscSub = audioContext.createOscillator();
+        
+        oscSquare.type = 'square';
+        oscSub.type = 'triangle';
+        
+        oscSquare.frequency.setValueAtTime(freq, time);
+        oscSub.frequency.setValueAtTime(freq / 2, time); // sub-octave fundamental backing
+        
+        const gSquare = audioContext.createGain();
+        gSquare.gain.setValueAtTime(0.75, time);
+        const gSub = audioContext.createGain();
+        gSub.gain.setValueAtTime(0.25, time);
+        
+        // Speaker cabinet bandpass filter (creates high-contrast mid-range peak around 1100Hz)
+        const speakerFilter = audioContext.createBiquadFilter();
+        speakerFilter.type = 'bandpass';
+        speakerFilter.Q.setValueAtTime(1.4, time);
+        speakerFilter.frequency.setValueAtTime(1100, time);
+        
+        // Digital Keypress Envelope Node (essential to mark beats cleanly)
+        const keypressGain = audioContext.createGain();
+        keypressGain.gain.setValueAtTime(0.0001, time);
+        // Quick 10ms attack + 60ms decay down to 82% sustain level (no popping clicks)
+        keypressGain.gain.linearRampToValueAtTime(1.0, time + 0.010);
+        keypressGain.gain.linearRampToValueAtTime(0.82, time + 0.070);
+        
+        oscSquare.connect(gSquare);
+        oscSub.connect(gSub);
+        
+        gSquare.connect(speakerFilter);
+        gSub.connect(speakerFilter);
+        
+        speakerFilter.connect(keypressGain);
+        keypressGain.connect(harmoniumMasterGain);
+        
+        oscSquare.start(time);
+        oscSub.start(time);
+        
+        activeLehraVoice = {
+            type: "radel",
+            oscSquare: oscSquare,
+            oscSub: oscSub,
+            speakerFilter: speakerFilter,
+            keypressGain: keypressGain
+        };
+        
     } else {
         // --- SOFT SINE KEY ---
         const osc = audioContext.createOscillator();
@@ -613,6 +663,14 @@ function stopLehraVoice(time) {
         voice.subOsc.stop(time + 0.2);
         voice.bellowsLfo.stop(time + 0.2);
         
+    } else if (voice.type === "radel") {
+        voice.keypressGain.gain.cancelScheduledValues(time);
+        voice.keypressGain.gain.setValueAtTime(voice.keypressGain.gain.value, time);
+        voice.keypressGain.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
+        
+        voice.oscSquare.stop(time + 0.15);
+        voice.oscSub.stop(time + 0.15);
+        
     } else if (voice.type === "flute") {
         voice.breathGain.gain.cancelScheduledValues(time);
         voice.breathGain.gain.setValueAtTime(voice.breathGain.gain.value, time);
@@ -646,53 +704,29 @@ function glideLehraVoice(noteOffset, time) {
         voice.osc2.frequency.exponentialRampToValueAtTime(freq, time + 0.08);
         voice.subOsc.frequency.exponentialRampToValueAtTime(freq / 2, time + 0.08);
         
-        // Soft volume bellows dip (volume drops only 15% briefly to accentuate the beat, NEVER fades to zero)
-        voice.bellowsGain.gain.setValueAtTime(1.0, time);
-        voice.bellowsGain.gain.linearRampToValueAtTime(0.85, time + 0.04);
-        voice.bellowsGain.gain.linearRampToValueAtTime(1.0, time + 0.18);
+    } else if (voice.type === "radel") {
+        // Crisp electronic slide (0.05s glide time typical of digital microprocessors)
+        voice.oscSquare.frequency.exponentialRampToValueAtTime(freq, time + 0.05);
+        voice.oscSub.frequency.exponentialRampToValueAtTime(freq / 2, time + 0.05);
+        
+        // Satisfying microprocessor keypress strike (ADSR envelope pluck)
+        voice.keypressGain.gain.cancelScheduledValues(time);
+        voice.keypressGain.gain.setValueAtTime(0.2, time); // Quick dip to 20% to accentuate the key release
+        voice.keypressGain.gain.linearRampToValueAtTime(1.0, time + 0.010); // 10ms sharp attack
+        voice.keypressGain.gain.linearRampToValueAtTime(0.82, time + 0.070); // 60ms decay to sustain
         
     } else if (voice.type === "flute") {
         // Flute glides slower (0.12s) to simulate breath transition sliding (Meend)
         voice.osc1.frequency.exponentialRampToValueAtTime(freq, time + 0.12);
         voice.osc2.frequency.exponentialRampToValueAtTime(freq, time + 0.12);
         
-        // Breath swell
-        voice.breathGain.gain.setValueAtTime(1.0, time);
-        voice.breathGain.gain.linearRampToValueAtTime(0.88, time + 0.05);
-        voice.breathGain.gain.linearRampToValueAtTime(1.0, time + 0.22);
-        
     } else {
-        voice.osc.frequency.setValueAtTime(freq, time);
-        voice.gain.gain.setValueAtTime(1.0, time);
-        voice.gain.gain.linearRampToValueAtTime(0.9, time + 0.03);
-        voice.gain.gain.linearRampToValueAtTime(1.0, time + 0.12);
+        // Smooth sine glide (0.08s slide)
+        voice.osc.frequency.exponentialRampToValueAtTime(freq, time + 0.08);
     }
 }
 
-/**
- * Pulses the volume gently during sustained notes (where melody is null)
- * to mark the rhythmic beat flow without changing the pitch.
- */
-function pulseLehraVolume(time) {
-    if (!activeLehraVoice) return;
-    
-    const voice = activeLehraVoice;
-    
-    if (voice.type === "harmonium") {
-        // Minor 6% volume dip (barely noticeable, keeps time supportive)
-        voice.bellowsGain.gain.setValueAtTime(1.0, time);
-        voice.bellowsGain.gain.linearRampToValueAtTime(0.94, time + 0.04);
-        voice.bellowsGain.gain.linearRampToValueAtTime(1.0, time + 0.16);
-    } else if (voice.type === "flute") {
-        voice.breathGain.gain.setValueAtTime(1.0, time);
-        voice.breathGain.gain.linearRampToValueAtTime(0.95, time + 0.05);
-        voice.breathGain.gain.linearRampToValueAtTime(1.0, time + 0.2);
-    } else {
-        voice.gain.gain.setValueAtTime(1.0, time);
-        voice.gain.gain.linearRampToValueAtTime(0.95, time + 0.03);
-        voice.gain.gain.linearRampToValueAtTime(1.0, time + 0.1);
-    }
-}
+
 
 // --- ORGANIC TANPURA DRONE ---
 
@@ -788,9 +822,6 @@ function scheduleNote(beatIndex, time) {
         }
         // Legato pitch glide
         glideLehraVoice(noteOffset, time);
-    } else {
-        // Legato sustain with gentle bellows volume swell
-        pulseLehraVolume(time);
     }
     
     scheduledNotesQueue.push({
